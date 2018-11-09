@@ -1,6 +1,6 @@
 {
   "manifest_version": 2,  // version 1 is unsupported
-  "name": "Vogue Covers",
+  "name": "Sample Extension",
   "version": "0.1",
 
   // we want to "pass messages" around
@@ -16,10 +16,8 @@
       // this dict says:
       // in the pages that match "matches", use the content from "js"
 
-      // search page:  https://search-proquest-com.proxy.library.cmu.edu/vogue/results/65CB48DF535345E2PQ/1?accountid=9902
-      // single cover: https://search-proquest-com.proxy.library.cmu.edu/vogue/docview/911812967/65CB48DF535345E2PQ/1?accountid=9902
-
-      "matches":["https://search-proquest-com.proxy.library.cmu.edu/vogue/results/*"],
+      // eg. "https://search-proquest-com.proxy.library.cmu.edu/vogue/docview/*" or something
+      "matches":["<all_urls>"],
 
       // make sure jquery goes BEFORE content
       "js": ["jquery-3.3.1.min.js", "content.js"]

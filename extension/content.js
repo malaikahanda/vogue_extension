@@ -1,5 +1,13 @@
-// get the first link on the page
 
+// Content scripts are JavaScript files that run in the context of web pages.
+// By using the standard Document Object Model (DOM),
+// they can read details of the web pages the browser visits,
+// or make changes to them.
+
+
+
+// get the URL of the first cover on that page
+// "read details"
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
 
@@ -9,17 +17,18 @@ chrome.runtime.onMessage.addListener(
       // $ is an alias for the jQuery function (creates an object)
       // .eq selects the 0th element
       // .attr gets the attribute stored at "href"
-      var firstHref = $("a[href^='http']").eq(0).attr("href");
 
-      // print it out--
-      // remember, we only enter this function when the icon is clicked
-      console.log(firstHref);
+      // start by finding all the links on the page
+      var resultHeader = document.getElementById("result-header-1");
+      console.log(resultHeader);
+      var links = resultHeader.getElementsByTagName("a");
+      var coverURL = links[0];
 
       // pass a message to background.js
       // the message is "open_new_tab"
       // we also pass some information: the first url that we found
-      chrome.runtime.sendMessage({"message": "open_new_tab",
-                                  "url": firstHref});
+      chrome.runtime.sendMessage({"message": "open_cover_tab",
+                                  "url": coverURL});
     }
   }
 );
