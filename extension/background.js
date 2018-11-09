@@ -1,5 +1,7 @@
-// when the user clicks, enter this function
+// when the user clicks, use the function
 chrome.browserAction.onClicked.addListener(
+
+    // use this function after clicking!
     function(tab) {
 
         // send a message to the active tab
@@ -18,6 +20,7 @@ chrome.browserAction.onClicked.addListener(
         // listen for the message about the URL
         // notice this is similar syntax to the code in content.js
         chrome.runtime.onMessage.addListener(
+
             function(request, sender, sendResponse) {
 
                 // if the message is telling us to open a new tab, let's do it
@@ -27,7 +30,9 @@ chrome.browserAction.onClicked.addListener(
                     chrome.tabs.create({"url": request.url});
                 }
             };
+            
         );
 
     };
+
 );
