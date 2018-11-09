@@ -14,7 +14,7 @@ chrome.browserAction.onClicked.addListener(
                 // use the value ("clicked_browser_action") to identify the message
                 // see content.js for where this is used
                 chrome.tabs.sendMessage(activeTab.id, {"message": "clicked_browser_action"});
-            };
+            }
         );
 
         // listen for the message about the URL
@@ -29,10 +29,10 @@ chrome.browserAction.onClicked.addListener(
                     // tell chrome to create a tab with that url
                     chrome.tabs.create({"url": request.url});
                 }
-            };
+            }
             
         );
 
-    };
+    }
 
 );
