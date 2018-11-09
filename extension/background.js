@@ -3,6 +3,8 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 
   // send a message to the active tab
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+
+    // get the first tab
     var activeTab = tabs[0];
 
     // use the value ("clicked_browser_action") to identify the message
@@ -22,4 +24,4 @@ chrome.browserAction.onClicked.addListener(function(tab) {
         chrome.tabs.create({"url": request.url});
       }
     }
-});
+);
