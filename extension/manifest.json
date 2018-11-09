@@ -1,0 +1,18 @@
+{
+  "manifest_version": 2,  // version 1 is unsupported
+  "name": "Vogue Covers",
+  "version": "0.1",
+  "content_scripts":
+  [
+    {
+      // this dict says:
+      // in the pages that match "matches", use the content from "js"
+
+      // eg. "https://search-proquest-com.proxy.library.cmu.edu/vogue/docview/*" or something
+      "matches":["<all_urls>"],
+
+      // make sure jquery goes BEFORE content
+      "js": ["jquery-3.3.1.min.js", "content.js"]
+    }
+  ]
+}
