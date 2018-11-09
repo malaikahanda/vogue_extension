@@ -2,6 +2,14 @@
   "manifest_version": 2,  // version 1 is unsupported
   "name": "Vogue Covers",
   "version": "0.1",
+
+  // we want to "pass messages" around
+  // do this using background files
+  "background":
+  {
+    "scripts": ["background.js"]
+  },
+
   "content_scripts": // content scripts only access the current page
   [
     {
@@ -18,14 +26,10 @@
 
   // create a lil icon for the extension
   // this is not visible unless there's a background script telling it to appear
+  // except i have that and it still doesn't appear so
+  // who knows
   "browser_action":
   {
     "default_icon": "icon.jpg"
-  },
-
-  // we want to "pass messages" around
-  "background":
-  {
-    "scripts": ["background.js"]
   }
 }
