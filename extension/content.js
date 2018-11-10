@@ -14,21 +14,15 @@ chrome.runtime.onMessage.addListener(
     // this is the value that we specified in background.js
     if( request.message === "clicked_browser_action" ) {
 
-      // $ is an alias for the jQuery function (creates an object)
-      // .eq selects the 0th element
-      // .attr gets the attribute stored at "href"
-
       // start by finding all the links on the page
-      var resultHeader = document.getElementById("result-header-1");
-      console.log(resultHeader);
-      var links = resultHeader.getElementsByTagName("a");
-      var coverURL = links[0];
+      var links = document.getElementsByClassName("Topicsresult"); // equivalent -> var links = $(".Topicsresult")
+      var firstLink = links[0].getAttribute("href");
 
       // pass a message to background.js
       // the message is "open_new_tab"
       // we also pass some information: the first url that we found
       chrome.runtime.sendMessage({"message": "open_cover_tab",
-                                  "url": coverURL});
+                                  "url": firstLink});
     }
   }
 );
