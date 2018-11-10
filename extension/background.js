@@ -1,54 +1,57 @@
-// create an image name: vol#_issue#_ddmmyyyy.png
-function getImageName() {
-    // get vol and issue
-    var volumeIssueList = document
-        .getElementsByClassName("issue_num_spacing")[0]
-        .innerHTML
-        .split("&nbsp;");
-    var volume = parseInt(volumeIssueList[2]).toString();
-    var issue = parseInt(volumeIssueList[4]).toString();
+// The name of the file to be downloaded.
+let imageFilename;
+// The search results tab.
+let mainTab;
+// Where we are on the current page of results.
+let index;
+// DEBUGGING: Which page we're on.
+let pages;
+// How many images we've processed.
+let numProcessed;
+// The number of results on the main tab.
+const NUM_RESULTS = 10;
+// For testing. Only do the first n pages.
+const MAX_PAGES = 3;
+// How many to download before taking a break.
+const MAX_CONSECUTIVE = 10;
+// How long of a break to take.
+const THROTTLE_TIME = 2000;
 
-    // get date
-    var monthMap = {"Jan": "01", "Feb": "02", "Mar": "03", "Apr": "04",
-                    "May": "05", "Jun": "06", "Jul": "07", "Aug": "08",
-                    "Sep": "09", "Oct": "10", "Nov": "11", "Dec": "12"}
-    var dateList = document
-        .getElementsByClassName("titleAuthorETC")[0]
-        .innerText
-        .split(" ");
-    var month = monthMap[dateList[3].replace("(", "")];
-    var day = ("0" + parseInt(dateList[4]).toString()).slice(-2);
-    var year = parseInt(dateList[5]).toString();
-
-    var imageName = `${volume}_${issue}_${day}${month}${year}`;
-    return(imageName);
+function getNextImage() {
+    // We've reached the end of the page.
+    if (index === NUM_RESULTS) {
+	if (pages === MAX_PAGES) {
+	    return;
+	}
+	index = 0;
+	pages++;
+	chrome.tabs.sendMessage(mainTab.id, {"message": "next_page_action"});
+    }
+    const sendNextRequest = () => chrome.tabs.sendMessage(mainTab.id, {"message": "open_tab_action", "index": index});
+    // If we're at a throttle point, take a break before opening the next tab.
+    if (numProcessed % MAX_CONSECUTIVE === 0) {
+	setTimeout(sendNextRequest, THROTTLE_TIME);
+    } else {
+	sendNextRequest();
+    }
+    index++;
+    numProcessed++;
 }
 
-// what to do on the new tab:
-// download the image with the image name
-function downloadCover(tab) {
-
-    var imageName = getImageName();
-    var imageURL = document
-        .getElementsByClassName("fullPageImage")[0]
-        .src;
-    chrome.downloads.download({"url": imageURL, "filename": imageName});
-
-}
-
-
-function openTab(tab) {
-
+function startExtension(tab) {
     // send a message to the active tab
     chrome.tabs.query({active: true, currentWindow: true},
         function(tabs) {
 
             // get the first tab
             var activeTab = tabs[0];
-
+	    mainTab = activeTab;
+	    index = 0;
+	    pages = 0;
+	    numProcessed = 0;
             // use the value ("clicked_browser_action") to identify the message
             // see content.js for where this is used
-            chrome.tabs.sendMessage(activeTab.id, {"message": "clicked_browser_action"});
+	    getNextImage();
         }
     );
 
@@ -63,19 +66,38 @@ function openTab(tab) {
             if( request.message === "open_cover_tab" ) {
                 // get the url from the request --> request.url
                 // tell chrome to create a tab with that url
-                chrome.tabs.create(
-                    {"url": request.url},
-                    (tab) => {chrome.tabs.executeScript(tab.id, {"code": downloadCover})}
-                );
+                chrome.tabs.create({"url": request.url});
             }
+
+	    // This message tells us we want to download an image.
+	    if( request.message === "download_cover_action" ) {
+		imageFilename = request.imageName;
+		// Trigger the download.
+		chrome.downloads.download({"url": request.imageUrl});
+		// Close the tab that sent this download request since we
+		// have its info already.
+		chrome.tabs.remove(sender.tab.id);
+	    }
+
+	    // This message tells us we're on the next page.
+	    if( request.message === "main_page_loaded" ) {
+		getNextImage();
+	    }
         }
-        
     );
 
 }
 
 // when the user clicks on the extension icon, 
 // will enter the "saveHundredCovers" function
-chrome.browserAction.onClicked.addListener(
-    openTab
-);
+chrome.browserAction.onClicked.addListener(startExtension);
+
+// Setting the filename on the download doesn't work. It is overridden
+// by headers in the response. Instead suggest the correct filename here.
+// Once we've made our suggestion, go to the next image.
+function suggestFilename(downloadItem, suggest) {
+    suggest({"filename": imageFilename});
+    getNextImage();
+};
+
+chrome.downloads.onDeterminingFilename.addListener(suggestFilename);

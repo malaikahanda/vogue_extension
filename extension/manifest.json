@@ -10,19 +10,32 @@
     "scripts": ["background.js"]
   },
 
+  "permissions": ["downloads"],
   "content_scripts": // content scripts only access the current page
   [
+    // Handle the search results page
     {
       // this dict says:
       // in the pages that match "matches", use the content from "js"
 
       // search page:  https://search-proquest-com.proxy.library.cmu.edu/vogue/results/65CB48DF535345E2PQ/1?accountid=9902
-      // single cover: https://search-proquest-com.proxy.library.cmu.edu/vogue/docview/911812967/65CB48DF535345E2PQ/1?accountid=9902
 
       "matches":["https://search-proquest-com.proxy.library.cmu.edu/vogue/results/*"],
 
       // make sure jquery goes BEFORE content
-      "js": ["jquery-3.3.1.min.js", "content.js"]
+      "js": ["content.js"]
+    },
+    // Handle the cover image page
+    {
+      // this dict says:
+      // in the pages that match "matches", use the content from "js"
+
+      // single cover: https://search-proquest-com.proxy.library.cmu.edu/vogue/docview/911812967/65CB48DF535345E2PQ/1?accountid=9902
+
+      "matches":["https://search-proquest-com.proxy.library.cmu.edu/vogue/docview/*"],
+
+      // make sure jquery goes BEFORE content
+      "js": ["image_content.js"]
     }
   ],
 
