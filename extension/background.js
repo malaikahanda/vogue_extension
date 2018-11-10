@@ -63,7 +63,10 @@ function openTab(tab) {
             if( request.message === "open_cover_tab" ) {
                 // get the url from the request --> request.url
                 // tell chrome to create a tab with that url
-                chrome.tabs.create({"url": request.url}, downloadCover);
+                chrome.tabs.create(
+                    {"url": request.url},
+                    (tab) => {chrome.tabs.executeScript(tab.id, {"code": downloadCover})}
+                );
             }
         }
         
