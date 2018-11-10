@@ -27,15 +27,17 @@ function getNextImage() {
 	pages++;
 	chrome.tabs.sendMessage(mainTab.id, {"message": "next_page_action"});
     }
-    const sendNextRequest = () => chrome.tabs.sendMessage(mainTab.id, {"message": "open_tab_action", "index": index});
+    const sendNextRequest = () => {
+	chrome.tabs.sendMessage(mainTab.id, {"message": "open_tab_action", "index": index});
+	index++;
+	numProcessed++;
+    };
     // If we're at a throttle point, take a break before opening the next tab.
     if (numProcessed % MAX_CONSECUTIVE === 0) {
 	setTimeout(sendNextRequest, THROTTLE_TIME);
     } else {
 	sendNextRequest();
     }
-    index++;
-    numProcessed++;
 }
 
 function startExtension(tab) {
